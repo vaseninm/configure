@@ -23,6 +23,23 @@ class Configure
 
     protected $data = null;
 
+    protected static $instance = null;
+
+    protected function __construct() {}
+    protected function __clone() {}
+
+    /**
+     * @return Configure
+     */
+    public static function me()
+    {
+        if (self::$instance === null) {
+            self::$instance = new Configure();
+        }
+
+        return self::$instance;
+    }
+
     /**
      * @param $folder
      * @return $this
@@ -34,18 +51,20 @@ class Configure
         return $this;
     }
 
-    public function addConfig($config)
+    public function addConfig($name, $path)
     {
-        $this->configs[] = $config;
+        $this->configs[$name] = $path;
 
         return $this;
     }
 
-    public function setConfig($config)
+    public function selectConfig($name)
     {
-        if (! in_array($config, $this->configs)) throw new \Exception("Config not [{$config}] found");
+        if (! array_key_exists($name, $this->configs)) throw new \Exception("Config not [{$name}] found");
 
-        $this->config = $config;
+        $this->config = $name;
+
+        return $this;
     }
 
     /**
@@ -78,6 +97,6 @@ class Configure
 
     protected function getConfigPath() {
 
-        return dirname($_SERVER["SCRIPT_FILENAME"]) . '/' . $this->config;
+        return dirname($_SERVER["SCRIPT_FILENAME"]) . '/' . $this->folder . '/';
     }
 }
